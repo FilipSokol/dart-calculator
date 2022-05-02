@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import './widgets/calc_button.dart';
@@ -34,24 +36,64 @@ class MyHomePage extends StatefulWidget {
 }
 
   class _MyHomePageState extends State<MyHomePage> {
-  // Wywalało błąd - Dart is null safe . You either must always assign a value or mark it explicitly as nullable using a ?
-  int? firstNum;
-  int? secondNum;
-  String? history;
-  String? textToDisplay;
-  String? res;
-  String? operation;
+  double firstNum = 0;
+  double secondNum = 0;
+  String history = "";
+  String textToDisplay = "";
+  String res = "";
+  String operation = "";
+
+  // DO USUWANIA 0 JEŚLI JEST np 11.0
+  RegExp regex = RegExp(r'([.]*0)(?!.*\d)');
 
   void btnOnClick(String btnVal){
     print(btnVal);
-    if( btnVal == 'Ent'){
-      textToDisplay = '';
+    if( btnVal == 'C'){
+      if( res.isNotEmpty ){
+        res = res.substring(0, res.length - 1);
+      }else{
+        res = "";
+      }
+    } else if ( btnVal == 'AC') {
+      textToDisplay = "";
       firstNum = 0;
       secondNum = 0;
-      res = '';
-    } else if ( btnVal == '+' || btnVal == '-' || btnVal == '*' || btnVal == '/'){
-      //firstNum = int.parse(textToDisplay);
+      res = "";
+      history = "";
+    } else if ( btnVal == '+' || btnVal == '-' || btnVal == '*' || btnVal == '/' || btnVal == "Num"){
+      firstNum = double.parse(textToDisplay);
+      res = "";
+      operation = btnVal;
+    } else if (btnVal == 'Ent') {
+      secondNum = double.parse(textToDisplay);
+      if( operation == '+'){
+        res = (firstNum + secondNum).toString().replaceAll(regex, '');
+        history = firstNum.toString().replaceAll(regex, '') + operation.toString() + secondNum.toString().replaceAll(regex, '');
+      }
+      if( operation == '-'){
+        res = (firstNum - secondNum).toString().replaceAll(regex, '');
+        history = firstNum.toString().replaceAll(regex, '') + operation.toString() + secondNum.toString().replaceAll(regex, '');
+      }
+      if( operation == '*'){
+        res = (firstNum * secondNum).toString().replaceAll(regex, '');
+        history = firstNum.toString().replaceAll(regex, '') + operation.toString() + secondNum.toString().replaceAll(regex, '');
+      }
+      if( operation == '/'){
+        res = (firstNum / secondNum).toString().replaceAll(regex, '');
+        history = firstNum.toString().replaceAll(regex, '') + operation.toString() + secondNum.toString().replaceAll(regex, '');
+      }
+      if( operation == "Num"){
+        res = (pow(firstNum, secondNum)).toString().replaceAll(regex, '');
+        history = firstNum.toString().replaceAll(regex, '') + "^" + secondNum.toString().replaceAll(regex, '');
+      }
+    } else {
+         res = double.parse(textToDisplay + btnVal).toString();
+         history = "";
     }
+
+    setState(() {
+      textToDisplay = res;
+    });
   }
 
   @override
@@ -71,7 +113,7 @@ class MyHomePage extends StatefulWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 0, bottom: 0, left: 12, right: 12),
                   child: Text(
-                    '957',
+                    history,
                     style: GoogleFonts.rubik(
                         textStyle: const TextStyle(
                           fontSize: 24,
@@ -86,7 +128,7 @@ class MyHomePage extends StatefulWidget {
               child: Padding(
                 padding: const EdgeInsets.only(top: 5, bottom: 12 , left: 12, right: 12),
                 child: Text(
-                  '957',
+                  textToDisplay,
                   style: GoogleFonts.rubik(
                     textStyle: const TextStyle(
                       fontSize: 48,
@@ -101,8 +143,16 @@ class MyHomePage extends StatefulWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   CalculatorButton(
-                    text: 'Num',
-                    fillColor: 0xf02a3682,
+                    text: 'AC',
+                    fillColor: 0xffD70040,
+                    textColor: 0xfff5f5f5,
+                    width: 80,
+                    height: 80,
+                    callback: btnOnClick,
+                  ),
+                  CalculatorButton(
+                    text: 'C',
+                    fillColor: 0xffD70040,
                     textColor: 0xfff5f5f5,
                     width: 80,
                     height: 80,
@@ -118,14 +168,6 @@ class MyHomePage extends StatefulWidget {
                   ),
                   CalculatorButton(
                     text: '*',
-                    fillColor: 0xffffeb3b,
-                    textColor: 0xff949494,
-                    width: 80,
-                    height: 80,
-                    callback: btnOnClick,
-                  ),
-                  CalculatorButton(
-                    text: '-',
                     fillColor: 0xffffeb3b,
                     textColor: 0xff949494,
                     width: 80,
@@ -163,6 +205,14 @@ class MyHomePage extends StatefulWidget {
                         height: 80,
                         callback: btnOnClick,
                       ),
+                      CalculatorButton(
+                        text: '0',
+                        fillColor: 0xff2a3682,
+                        textColor: 0xfff5f5f5,
+                        width: 80,
+                        height: 80,
+                        callback: btnOnClick,
+                      ),
                     ],
                   ),
                   Column(
@@ -184,6 +234,14 @@ class MyHomePage extends StatefulWidget {
                       ),
                       CalculatorButton(
                         text: '2',
+                        fillColor: 0xff2a3682,
+                        textColor: 0xfff5f5f5,
+                        width: 80,
+                        height: 80,
+                        callback: btnOnClick,
+                      ),
+                      CalculatorButton(
+                        text: '.',
                         fillColor: 0xff2a3682,
                         textColor: 0xfff5f5f5,
                         width: 80,
@@ -218,50 +276,45 @@ class MyHomePage extends StatefulWidget {
                         height: 80,
                         callback: btnOnClick,
                       ),
+                      CalculatorButton(
+                        text: 'Num',
+                        fillColor: 0xff2a3682,
+                        textColor: 0xfff5f5f5,
+                        width: 80,
+                        height: 80,
+                        callback: btnOnClick,
+                      ),
                     ],
                   ),
                   Column(
                     children: [
                       CalculatorButton(
+                        text: '-',
+                        fillColor: 0xffffeb3b,
+                        textColor: 0xff949494,
+                        width: 80,
+                        height: 80,
+                        callback: btnOnClick,
+                      ),
+                      CalculatorButton(
                         text: '+',
                         fillColor: 0xffffeb3b,
                         textColor: 0xff949494,
                         width: 80,
-                        height: 130,
+                        height: 80,
                         callback: btnOnClick,
                       ),
                       CalculatorButton(
                         text: 'Ent',
-                        fillColor: 0xff2a3682,
+                        fillColor: 0xff57D352,
                         textColor: 0xfff5f5f5,
                         width: 80,
-                        height: 130,
+                        height: 180,
                         callback: btnOnClick,
                       ),
                     ],
                   ),
                 ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                CalculatorButton(
-                  text: '0',
-                  fillColor: 0xff2a3682,
-                  textColor: 0xfff5f5f5,
-                  width: 185,
-                  height: 80,
-                  callback: btnOnClick,
-                ),
-                CalculatorButton(
-                  text: '.',
-                  fillColor: 0xff2a3682,
-                  textColor: 0xfff5f5f5,
-                  width: 185,
-                  height: 80,
-                  callback: btnOnClick,
-                ),
-              ],
             ),
           ],
         ),
