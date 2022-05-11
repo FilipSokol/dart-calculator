@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -42,12 +43,14 @@ class MyHomePage extends StatefulWidget {
   String textToDisplay = "";
   String res = "";
   String operation = "";
+  bool numberBlock = false;
 
-  // DO USUWANIA 0 JEŚLI JEST np 11.0
   RegExp regex = RegExp(r'([.]*0)(?!.*\d)');
 
   void btnOnClick(String btnVal){
+
     print(btnVal);
+
     if( btnVal == 'C'){
       if( res.isNotEmpty ){
         res = res.substring(0, res.length - 1);
@@ -60,35 +63,54 @@ class MyHomePage extends StatefulWidget {
       secondNum = 0;
       res = "";
       history = "";
-    } else if ( btnVal == '+' || btnVal == '-' || btnVal == '*' || btnVal == '/' || btnVal == "Num"){
-      firstNum = double.parse(textToDisplay);
-      res = "";
-      operation = btnVal;
-    } else if (btnVal == 'Ent') {
-      secondNum = double.parse(textToDisplay);
-      if( operation == '+'){
-        res = (firstNum + secondNum).toString().replaceAll(regex, '');
-        history = firstNum.toString().replaceAll(regex, '') + operation.toString() + secondNum.toString().replaceAll(regex, '');
-      }
-      if( operation == '-'){
-        res = (firstNum - secondNum).toString().replaceAll(regex, '');
-        history = firstNum.toString().replaceAll(regex, '') + operation.toString() + secondNum.toString().replaceAll(regex, '');
-      }
-      if( operation == '*'){
-        res = (firstNum * secondNum).toString().replaceAll(regex, '');
-        history = firstNum.toString().replaceAll(regex, '') + operation.toString() + secondNum.toString().replaceAll(regex, '');
-      }
-      if( operation == '/'){
-        res = (firstNum / secondNum).toString().replaceAll(regex, '');
-        history = firstNum.toString().replaceAll(regex, '') + operation.toString() + secondNum.toString().replaceAll(regex, '');
-      }
-      if( operation == "Num"){
-        res = (pow(firstNum, secondNum)).toString().replaceAll(regex, '');
-        history = firstNum.toString().replaceAll(regex, '') + "^" + secondNum.toString().replaceAll(regex, '');
-      }
     } else {
-         res = double.parse(textToDisplay + btnVal).toString();
-         history = "";
+      if ( btnVal == '1' ||
+           btnVal == '2' ||
+           btnVal == '3' ||
+           btnVal == '4' ||
+           btnVal == '5' ||
+           btnVal == '6' ||
+           btnVal == '7' ||
+           btnVal == '8' ||
+           btnVal == '9' ||
+           btnVal == '0'){
+        if(numberBlock == false) {
+          res = double.parse(textToDisplay + btnVal).toString();
+          history = "";
+        } else {
+          textToDisplay = "";
+          res = double.parse(textToDisplay + btnVal).toString();
+          history = "";
+          numberBlock = false;
+        }
+      } else if ( btnVal == '+' || btnVal == '-' || btnVal == '*' || btnVal == '/' || btnVal == 'Num'){
+          firstNum = double.parse(textToDisplay);
+          res = "";
+          operation = btnVal;
+      } else if (btnVal == 'Ent') {
+        secondNum = double.parse(textToDisplay);
+        numberBlock = true;
+        if( operation == '+'){
+          res = (firstNum + secondNum).toString().replaceAll(regex, '');
+          history = firstNum.toString().replaceAll(regex, '') + operation.toString() + secondNum.toString().replaceAll(regex, '');
+        }
+        if( operation == '-'){
+          res = (firstNum - secondNum).toString().replaceAll(regex, '');
+          history = firstNum.toString().replaceAll(regex, '') + operation.toString() + secondNum.toString().replaceAll(regex, '');
+        }
+        if( operation == '*'){
+          res = (firstNum * secondNum).toString().replaceAll(regex, '');
+          history = firstNum.toString().replaceAll(regex, '') + operation.toString() + secondNum.toString().replaceAll(regex, '');
+        }
+        if( operation == '/'){
+          res = (firstNum / secondNum).toString().replaceAll(regex, '');
+          history = firstNum.toString().replaceAll(regex, '') + operation.toString() + secondNum.toString().replaceAll(regex, '');
+        }
+        if( operation == "Num"){
+          res = (pow(firstNum, secondNum)).toString().replaceAll(regex, '');
+          history = firstNum.toString().replaceAll(regex, '') + "^" + secondNum.toString().replaceAll(regex, '');
+        }
+      }
     }
 
     setState(() {
